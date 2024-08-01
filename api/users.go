@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db/users"
+	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/email"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/types"
 )
 
@@ -55,11 +56,24 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := users.Create(context.Background(), userReq.Username, userReq.Password)
+	// check if the email is already taken
+	emailExists, emailErr := users.CheckEmail(context.Background(), userReq.Email)
+	if emailErr != nil {
+		http.Error(w, emailErr.Error(), http.StatusInternalServerError)
+		return
+	}
+	if emailExists {
+		http.Error(w, "Email already taken", http.StatusBadRequest)
+		return
+	}
+
+	newUser, err := users.Create(context.Background(), userReq.Username, userReq.Email, userReq.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	email.SendEmail(newUser)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created successfully"))
