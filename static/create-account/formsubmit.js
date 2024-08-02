@@ -35,7 +35,7 @@ async function sendData() {
     });
 
     if (response.ok) {
-        window.location.href = "/success";
+        window.location.href = "/create-account/confirm-email";
     } else {
         alert("Failed to create account");
     }

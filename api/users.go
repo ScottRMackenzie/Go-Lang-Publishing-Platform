@@ -93,7 +93,9 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email.SendEmail(newUser)
+	emailVerificationToken, err := users.GenerateEmailVerificationToken(context.Background(), newUser.ID)
+
+	email.SendEmailVerification(newUser, emailVerificationToken)
 
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("User created successfully"))

@@ -1,0 +1,20 @@
+// package email_verification
+
+// import "net/http"
+
+// func VerifyEmailHandler(w http.ResponseWriter, r *http.Request) {
+// 	// id := r.PathValue("id")
+// 	// if id == "" {
+// 	// 	errorResponse(w, http.StatusBadRequest, "id is required")
+// 	// 	return
+// 	// }
+
+// 	// user, err := users.GetByID(id, context.Background())
+// 	// if err != nil {
+// 	// 	errorResponse(w, http.StatusInternalServerError, err.Error())
+// 	// 	return
+// 	// }
+
+// 	// w.Header().Set("Content-Type", "application/json")
+// 	// json.NewEncoder(w).Encode(user)
+// }

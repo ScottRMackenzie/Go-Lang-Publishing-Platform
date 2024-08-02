@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api"
+	email_verification "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api/verification"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db"
 	"github.com/joho/godotenv"
 )
@@ -37,6 +38,7 @@ func main() {
 
 		mux.HandleFunc("POST /api", api.WelcomeHandler)
 		mux.HandleFunc("POST /api/users/create", api.CreateUserHandler)
+		mux.HandleFunc("GET /api/users/verify-email/{token}", email_verification.VerifyEmailHandler)
 
 		// !! Dangerous code
 		mux.HandleFunc("POST /api/users", api.GetUsersHandler)

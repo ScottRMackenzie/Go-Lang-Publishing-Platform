@@ -42,3 +42,13 @@ func DoesEmailExist(ctx context.Context, email string) (bool, error) {
 	}
 	return exists, nil
 }
+
+func GenerateEmailVerificationToken(ctx context.Context, userID string) (string, error) {
+	token := uuid.New().String()
+	_, err := db.Pool.Exec(ctx, "INSERT INTO email_verifications (user_id, verification_token) VALUES ($1, $2)", userID, token)
+	if err != nil {
+		log.Fatal(err)
+		return "", err
+	}
+	return token, nil
+}
