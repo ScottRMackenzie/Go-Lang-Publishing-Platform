@@ -23,7 +23,7 @@ func Create(ctx context.Context, username, email, password string) (types.User, 
 	return types.User{ID: id, Username: username, Email: email, CreatedAt: created_at}, nil
 }
 
-func CheckUsername(ctx context.Context, username string) (bool, error) {
+func DoesUsernameExist(ctx context.Context, username string) (bool, error) {
 	var exists bool
 	err := db.Pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)", username).Scan(&exists)
 	if err != nil {
@@ -33,7 +33,7 @@ func CheckUsername(ctx context.Context, username string) (bool, error) {
 	return exists, nil
 }
 
-func CheckEmail(ctx context.Context, email string) (bool, error) {
+func DoesEmailExist(ctx context.Context, email string) (bool, error) {
 	var exists bool
 	err := db.Pool.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)", email).Scan(&exists)
 	if err != nil {

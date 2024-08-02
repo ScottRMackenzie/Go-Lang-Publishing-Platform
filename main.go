@@ -42,9 +42,11 @@ func main() {
 		mux.HandleFunc("POST /api/users", api.GetUsersHandler)
 		mux.HandleFunc("POST /api/users/{id}", api.GetUserByIDHandler)
 
+		middlewareHandler := corsMiddleware(ApiMiddleware(mux))
+
 		apiServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", apiPort),
-			Handler: mux,
+			Handler: middlewareHandler,
 		}
 		fmt.Printf("API server started on :%d\n", apiPort)
 		if err := apiServer.ListenAndServe(); err != nil {
@@ -57,7 +59,9 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 		mux.Handle("/", staticHandle(http.FileServer(http.Dir("./static"))))
+		// mux.HandleFunc("POST /api/users/create", api.CreateUserHandler)
 		defer wg.Done()
+
 		staticServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", staticPort),
 			Handler: mux,
@@ -73,6 +77,32 @@ func main() {
 
 func staticHandle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+	})
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func ApiMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// print each request
+		fmt.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
 		next.ServeHTTP(w, r)
 	})
 }
