@@ -52,5 +52,5 @@ func VerifyEmailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to delete token", http.StatusInternalServerError)
 	}
 
-	http.Redirect(w, r, "http://localhost:80/create-account/confirm-email/success", http.StatusOK)
+	http.Redirect(w, r, "http://localhost:80/create-account/confirm-email/success", http.StatusSeeOther)
 }
