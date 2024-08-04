@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/auth"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db/users"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/email"
-	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/types"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -41,8 +41,13 @@ func GetUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("CreateUserHandler")
-	var userReq types.UserAccountCreationRequest
+	type UserAccountCreationRequest struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	var userReq UserAccountCreationRequest
 	if err := json.NewDecoder(r.Body).Decode(&userReq); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
@@ -101,4 +106,43 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("User created successfully"))
 
 	// http.Redirect(w, r, "/create-account/success", http.StatusOK)
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	type LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	type LoginResponse struct {
+		Token string `json:"token"`
+	}
+
+	var loginReq LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&loginReq); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	user, err := users.GetByUsername(loginReq.Username, context.Background())
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusInternalServerError)
+		return
+	}
+
+	hashedPassword, err := users.GetHashedPasswordByUsername(loginReq.Username, context.Background())
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(loginReq.Password))
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		return
+	}
+
+	token, err := auth.GenerateJWT(user.ID, user.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(LoginResponse{Token: token})
 }

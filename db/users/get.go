@@ -50,3 +50,23 @@ func GetByUsername(username string, ctx context.Context) (types.User, error) {
 
 	return user, nil
 }
+
+func GetByEmail(email string, ctx context.Context) (types.User, error) {
+	var user types.User
+	err := db.Pool.QueryRow(ctx, "SELECT id, username FROM users WHERE email = $1", email).Scan(&user.ID, &user.Username)
+	if err != nil {
+		return types.User{}, err
+	}
+
+	return user, nil
+}
+
+func GetHashedPasswordByUsername(username string, ctx context.Context) (string, error) {
+	var hashedPassword string
+	err := db.Pool.QueryRow(ctx, "SELECT password FROM users WHERE username = $1", username).Scan(&hashedPassword)
+	if err != nil {
+		return "", err
+	}
+
+	return hashedPassword, nil
+}

@@ -8,7 +8,9 @@ import (
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api"
 	email_verification "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api/verification"
+	controller "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/controllers"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db"
+	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/middleware"
 	"github.com/joho/godotenv"
 )
 
@@ -36,13 +38,11 @@ func main() {
 
 		mux := http.NewServeMux()
 
-		mux.HandleFunc("POST /api", api.WelcomeHandler)
-		mux.HandleFunc("POST /api/users/create", api.CreateUserHandler)
-		mux.HandleFunc("GET /api/users/verify-email/{token}", email_verification.VerifyEmailHandler)
-
-		// !! Dangerous code
-		mux.HandleFunc("POST /api/users", api.GetUsersHandler)
-		mux.HandleFunc("POST /api/users/{id}", api.GetUserByIDHandler)
+		mux.HandleFunc("/api/login", api.LoginHandler)
+		mux.Handle("/api/users", middleware.JWTMiddleware(http.HandlerFunc(api.GetUsersHandler)))
+		mux.Handle("/api/users/create", middleware.JWTMiddleware(http.HandlerFunc(api.CreateUserHandler)))
+		mux.Handle("/api/users/verify-email/{token}", middleware.JWTMiddleware(http.HandlerFunc(email_verification.VerifyEmailHandler)))
+		mux.Handle("/api/users/{id}", middleware.JWTMiddleware(http.HandlerFunc(api.GetUserByIDHandler)))
 
 		middlewareHandler := corsMiddleware(ApiMiddleware(mux))
 
@@ -56,12 +56,12 @@ func main() {
 		}
 	}()
 
-	// Static file server
+	// Template server
 	wg.Add(1)
 	go func() {
 		mux := http.NewServeMux()
-		mux.Handle("/", staticHandle(http.FileServer(http.Dir("./static"))))
-		// mux.HandleFunc("POST /api/users/create", api.CreateUserHandler)
+		mux.Handle("/", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
+		mux.HandleFunc("/login", controller.LoginHandler)
 		defer wg.Done()
 
 		staticServer := &http.Server{

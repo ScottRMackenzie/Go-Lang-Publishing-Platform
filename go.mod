@@ -4,7 +4,11 @@ go 1.22.5
 
 require github.com/google/uuid v1.6.0
 
-require github.com/pkg/errors v0.9.1 // indirect
+require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+)
 
 require (
 	github.com/gorilla/context v1.1.2 // indirect

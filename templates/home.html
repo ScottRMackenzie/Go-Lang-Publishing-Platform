@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    {{if .Authenticated}}
+        <h1>Welcome, {{.Username}}!</h1>
+        <p>You are logged in.</p>
+    {{else}}
+        <h1>Welcome to our platform!</h1>
+        <p>Please <a href="/login">log in</a> to access more features.</p>
+    {{end}}
+</body>
+</html>
