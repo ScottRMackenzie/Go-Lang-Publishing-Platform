@@ -1,0 +1,21 @@
+<body>
+    <nav class="bg-gray-800 p-4">
+        {{ if .Authenticated }}
+            <a href="/profile" class="text-white">
+                <img src="profile-icon.png" alt="Profile" class="inline-block h-8 w-8 rounded-full">
+            </a>
+        {{ else }}
+            <a href="/login" class="text-white">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Login</button>
+            </a>
+        {{ end }}
+        <a href="/" class="text-white">
+            <h1 class="text-2xl font-bold">My Website</h1>
+        </a>
+        <div class="mt-4">
+            <input type="text" placeholder="Search" class="p-2 rounded border border-gray-300">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Search</button>
+        </div>
+    </nav>
+</body>
+</html>

@@ -5,9 +5,9 @@ import (
 	"text/template"
 )
 
-var homeTemplate = template.Must(template.ParseFiles("templates/home.html"))
-
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	homeTemplate := template.Must(template.ParseFiles("templates/home.html", "templates/components/navbar.html"))
+
 	authenticated := r.Context().Value("authenticated").(bool)
 	username := r.Context().Value("username")
 
@@ -19,7 +19,17 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		Username:      username.(string),
 	}
 
-	if err := homeTemplate.Execute(w, data); err != nil {
-		http.Error(w, "Failed to render template", http.StatusInternalServerError)
+	// Execute the home template, which now includes the navbar template
+	if err := homeTemplate.ExecuteTemplate(w, "home.html", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+// // print the home template file
+// temp, err := ioutil.ReadFile("templates/components/navbar.html")
+// fmt.Println("navbar: ", string(temp))
+
+// homeTemplate, err := template.New("base").ParseFiles("templates/home.html")
+// if err != nil {
+// 	http.Error(w, "Failed to render template 1", http.StatusInternalServerError)
+// }
