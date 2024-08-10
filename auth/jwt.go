@@ -1,11 +1,11 @@
 package auth
 
 import (
+	"errors"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 )
 
 type Claims struct {
@@ -15,11 +15,15 @@ type Claims struct {
 }
 
 func GenerateJWT(ID, username string) (string, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return "", err
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	return "", err
+	// }
 	var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+
+	if jwtKey == nil || len(jwtKey) == 0 {
+		return "", errors.New("JWT_SECRET is not set")
+	}
 
 	claims := &Claims{
 		UserID:   ID,
@@ -33,11 +37,15 @@ func GenerateJWT(ID, username string) (string, error) {
 }
 
 func VerifyJWT(token string) (*Claims, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+
+	if jwtKey == nil || len(jwtKey) == 0 {
+		return nil, errors.New("JWT_SECRET is not set")
+	}
 
 	tkn, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil

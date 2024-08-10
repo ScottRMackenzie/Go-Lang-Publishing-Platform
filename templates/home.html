@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <link href="/static/css/tailwind.css" rel="stylesheet">
     <title>Home</title>
 </head>
 <body>
@@ -14,7 +15,7 @@
         <h1>Welcome, {{.Username}}!</h1>
         <p>You are logged in.</p>
     {{else}}
-        <h1>Welcome to our platform!</h1>
+        <h1>Welcome to TB Books!</h1>
         <p>Please <a href="/login">log in</a> to access more features.</p>
     {{end}}
 </body>

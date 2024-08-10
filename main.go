@@ -44,7 +44,12 @@ func main() {
 		mux.Handle("/api/users/verify-email/{token}", middleware.JWTMiddleware(http.HandlerFunc(email_verification.VerifyEmailHandler)))
 		mux.Handle("/api/users/{id}", middleware.JWTMiddleware(http.HandlerFunc(api.GetUserByIDHandler)))
 
-		middlewareHandler := corsMiddleware(ApiMiddleware(mux))
+		mux.HandleFunc("/api/books", api.GetAllBooksHandler)
+		mux.HandleFunc("/api/books/{id}", api.GetBookByIDHandler)
+		mux.HandleFunc("/api/books/sorted", api.GetSortedBooksHandler)
+		mux.HandleFunc("/api/books/search", api.SearchBooksHandler)
+
+		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 
 		apiServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", apiPort),
@@ -60,15 +65,18 @@ func main() {
 	wg.Add(1)
 	go func() {
 		mux := http.NewServeMux()
-		mux.Handle("/", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
-		mux.HandleFunc("/login", controller.LoginHandler)
+		mux.Handle("GET /static/", staticHandle(http.StripPrefix("/static/", http.FileServer(http.Dir("static")))))
+		mux.Handle("GET /", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
+		mux.Handle("GET /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
+		mux.Handle("POST /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
+		mux.Handle("GET /logout", middleware.AuthMiddleware(http.HandlerFunc(controller.LogoutHandler)))
 		defer wg.Done()
 
 		staticServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", staticPort),
-			Handler: mux,
+			Handler: LoggingMiddleware(mux),
 		}
-		fmt.Printf("Static file server started on :%d\n", staticPort)
+		fmt.Printf("Template and static file server started on :%d\n", staticPort)
 		if err := staticServer.ListenAndServe(); err != nil {
 			fmt.Printf("Static file server error: %v\n", err)
 		}
@@ -101,7 +109,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func ApiMiddleware(next http.Handler) http.Handler {
+func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// print each request
 		fmt.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)

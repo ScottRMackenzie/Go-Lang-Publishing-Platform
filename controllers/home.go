@@ -11,12 +11,18 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	authenticated := r.Context().Value("authenticated").(bool)
 	username := r.Context().Value("username")
 
+	if username == nil {
+		username = ""
+	}
+
 	data := struct {
 		Authenticated bool
 		Username      string
+		ActivePage    string
 	}{
 		Authenticated: authenticated,
 		Username:      username.(string),
+		ActivePage:    "home",
 	}
 
 	// Execute the home template, which now includes the navbar template

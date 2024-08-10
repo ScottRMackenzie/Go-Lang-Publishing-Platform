@@ -9,17 +9,21 @@ import (
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db/users"
 )
 
-var loginTemplate = template.Must(template.ParseFiles("templates/login.html"))
+var loginTemplate = template.Must(template.ParseFiles("templates/login.html", "templates/components/navbar.html"))
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
+		authenticated := r.Context().Value("authenticated").(bool)
+		if authenticated {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+
 		if err := loginTemplate.Execute(w, nil); err != nil {
 			http.Error(w, "Failed to render template", http.StatusInternalServerError)
 		}
 		return
-	}
-
-	if r.Method == http.MethodPost {
+	} else if r.Method == http.MethodPost {
 		var loginReq struct {
 			Username string `json:"username"`
 			Password string `json:"password"`
@@ -32,6 +36,23 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 			return
+		}
+
+		if !user.IsVerified {
+			censoredEmail := user.Email[:3] + "*****" + user.Email[len(user.Email)-3:]
+			http.SetCookie(w, &http.Cookie{
+				Name:     "username",
+				Value:    user.Username,
+				Expires:  time.Now().Add(1 * time.Hour),
+				HttpOnly: true,
+			})
+			http.SetCookie(w, &http.Cookie{
+				Name:     "email",
+				Value:    censoredEmail,
+				Expires:  time.Now().Add(1 * time.Hour),
+				HttpOnly: true,
+			})
+			http.Redirect(w, r, "/verify", http.StatusSeeOther)
 		}
 
 		token, err := auth.GenerateJWT(user.ID, user.Username)
@@ -48,5 +69,18 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    "",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		HttpOnly: true,
+	})
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
