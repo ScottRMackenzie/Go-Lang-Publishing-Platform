@@ -52,3 +52,30 @@ var ValidSortColumns = map[string]bool{
 	"isbn": true, "genre": true, "language_code": true, "publisher": true,
 	"created_at": true, "updated_at": true, "summary": true, "word_count": true,
 }
+
+var ValidOrder = map[string]bool{
+	"ASC": true, "DESC": true,
+}
+
+type MatchFilter struct {
+	CaseSensitive map[string]bool   `json:"case_sensitive"`
+	Values        map[string]string `json:"values"`
+}
+
+type Filters struct {
+	ExactMatch   MatchFilter `json:"exact_match"`
+	PartialMatch MatchFilter `json:"partial_match"`
+}
+
+func InitializeNewFilters() Filters {
+	return Filters{
+		ExactMatch: MatchFilter{
+			CaseSensitive: make(map[string]bool),
+			Values:        make(map[string]string),
+		},
+		PartialMatch: MatchFilter{
+			CaseSensitive: make(map[string]bool),
+			Values:        make(map[string]string),
+		},
+	}
+}

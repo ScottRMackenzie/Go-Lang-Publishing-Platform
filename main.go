@@ -47,7 +47,7 @@ func main() {
 		mux.HandleFunc("/api/books", api.GetAllBooksHandler)
 		mux.HandleFunc("/api/books/{id}", api.GetBookByIDHandler)
 		mux.HandleFunc("/api/books/sorted", api.GetSortedBooksHandler)
-		mux.HandleFunc("/api/books/search", api.SearchBooksHandler)
+		mux.HandleFunc("/api/books/search", api.FilteredSearchBooksHandler)
 
 		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 
