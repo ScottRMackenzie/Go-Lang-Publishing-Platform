@@ -38,22 +38,22 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if !user.IsVerified {
-			censoredEmail := user.Email[:3] + "*****" + user.Email[len(user.Email)-3:]
-			http.SetCookie(w, &http.Cookie{
-				Name:     "username",
-				Value:    user.Username,
-				Expires:  time.Now().Add(1 * time.Hour),
-				HttpOnly: true,
-			})
-			http.SetCookie(w, &http.Cookie{
-				Name:     "email",
-				Value:    censoredEmail,
-				Expires:  time.Now().Add(1 * time.Hour),
-				HttpOnly: true,
-			})
-			http.Redirect(w, r, "/verify", http.StatusSeeOther)
-		}
+		// if !user.IsVerified {
+		// 	censoredEmail := user.Email // user.Email[:3] + "*****" + user.Email[len(user.Email)-3:]
+		// 	http.SetCookie(w, &http.Cookie{
+		// 		Name:     "username",
+		// 		Value:    user.Username,
+		// 		Expires:  time.Now().Add(1 * time.Hour),
+		// 		HttpOnly: true,
+		// 	})
+		// 	http.SetCookie(w, &http.Cookie{
+		// 		Name:     "email",
+		// 		Value:    censoredEmail,
+		// 		Expires:  time.Now().Add(1 * time.Hour),
+		// 		HttpOnly: true,
+		// 	})
+		// 	http.Redirect(w, r, "/verify", http.StatusSeeOther)
+		// }
 
 		token, err := auth.GenerateJWT(user.ID, user.Username)
 		if err != nil {

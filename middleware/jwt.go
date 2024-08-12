@@ -50,6 +50,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		// Valid token
 		ctx := context.WithValue(r.Context(), "authenticated", true)
 		ctx = context.WithValue(ctx, "username", claims.Username)
+		ctx = context.WithValue(ctx, "token", cookie.Value)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

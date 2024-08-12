@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"mime"
 	"net/http"
 	"os"
 	"sync"
@@ -13,6 +14,11 @@ import (
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/middleware"
 	"github.com/joho/godotenv"
 )
+
+func init() {
+	// Register the JavaScript MIME type
+	mime.AddExtensionType(".js", "application/javascript")
+}
 
 func main() {
 	apiPort := 2337
@@ -66,15 +72,22 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 		mux.Handle("GET /static/", staticHandle(http.StripPrefix("/static/", http.FileServer(http.Dir("static")))))
+		mux.Handle("GET /favicon.ico", staticHandle(http.FileServer(http.Dir("static"))))
+		// mux.HandleFunc("GET /static/js/", serveJavaScript)
+
 		mux.Handle("GET /", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
 		mux.Handle("GET /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 		mux.Handle("POST /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 		mux.Handle("GET /logout", middleware.AuthMiddleware(http.HandlerFunc(controller.LogoutHandler)))
+
+		mux.Handle("GET /client-api/{path}", middleware.AuthMiddleware(http.HandlerFunc(controller.ClientAPIHandler)))
 		defer wg.Done()
+
+		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 
 		staticServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", staticPort),
-			Handler: LoggingMiddleware(mux),
+			Handler: middlewareHandler,
 		}
 		fmt.Printf("Template and static file server started on :%d\n", staticPort)
 		if err := staticServer.ListenAndServe(); err != nil {
