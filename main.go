@@ -50,10 +50,10 @@ func main() {
 		mux.Handle("/api/users/verify-email/{token}", middleware.JWTMiddleware(http.HandlerFunc(email_verification.VerifyEmailHandler)))
 		mux.Handle("/api/users/{id}", middleware.JWTMiddleware(http.HandlerFunc(api.GetUserByIDHandler)))
 
-		mux.HandleFunc("/api/books", api.GetAllBooksHandler)
-		mux.HandleFunc("/api/books/{id}", api.GetBookByIDHandler)
-		mux.HandleFunc("/api/books/sorted", api.GetSortedBooksHandler)
-		mux.HandleFunc("/api/books/search", api.FilteredSearchBooksHandler)
+		mux.HandleFunc("/api/v1/public/books", api.GetAllBooksHandler)
+		mux.HandleFunc("/api/v1/public/books/{id}", api.GetBookByIDHandler)
+		mux.HandleFunc("/api/v1/public/books/sorted", api.GetSortedBooksHandler)
+		mux.HandleFunc("/api/v1/public/books/search", api.FilteredSearchBooksHandler)
 
 		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 
@@ -71,17 +71,22 @@ func main() {
 	wg.Add(1)
 	go func() {
 		mux := http.NewServeMux()
+		defer wg.Done()
+
 		mux.Handle("GET /static/", staticHandle(http.StripPrefix("/static/", http.FileServer(http.Dir("static")))))
 		mux.Handle("GET /favicon.ico", staticHandle(http.FileServer(http.Dir("static"))))
 		// mux.HandleFunc("GET /static/js/", serveJavaScript)
+		mux.HandleFunc("GET /static/books/covers/{id}", controller.ServeBookCover)
 
 		mux.Handle("GET /", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
 		mux.Handle("GET /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 		mux.Handle("POST /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 		mux.Handle("GET /logout", middleware.AuthMiddleware(http.HandlerFunc(controller.LogoutHandler)))
 
+		mux.Handle("GET /browse", middleware.AuthMiddleware(http.HandlerFunc(controller.BrowseHandler)))
+
 		mux.Handle("GET /client-api/{path}", middleware.AuthMiddleware(http.HandlerFunc(controller.ClientAPIHandler)))
-		defer wg.Done()
+		mux.Handle("GET /check-authenticated", middleware.AuthMiddleware(http.HandlerFunc(controller.CheckIfAuthenticatedHandler)))
 
 		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 

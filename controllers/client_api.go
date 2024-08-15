@@ -31,6 +31,11 @@ func ClientAPIHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := http.DefaultClient.Do(req)
 
+	if resp.StatusCode == http.StatusUnauthorized {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	if err != nil {
 		http.Error(w, "Failed to fetch data from API", http.StatusInternalServerError)
 		return
@@ -46,4 +51,13 @@ func ClientAPIHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Response:", string(body))
 
 	w.Write(body)
+}
+
+func CheckIfAuthenticatedHandler(w http.ResponseWriter, r *http.Request) {
+	authenticated := r.Context().Value("authenticated").(bool)
+	if authenticated {
+		w.Write([]byte("true"))
+	} else {
+		w.Write([]byte("false"))
+	}
 }

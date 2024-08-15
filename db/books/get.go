@@ -10,7 +10,7 @@ import (
 )
 
 func GetAll() ([]types.Book, error) {
-	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count FROM books")
+	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books")
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func GetAll() ([]types.Book, error) {
 	var books []types.Book
 	for rows.Next() {
 		var book types.Book
-		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount); err != nil {
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount, &book.CoverImgUrl); err != nil {
 			return nil, err
 		}
 		books = append(books, book)
@@ -34,7 +34,7 @@ func GetAll() ([]types.Book, error) {
 
 func GetByID(id string) (types.Book, error) {
 	var book types.Book
-	err := db.Pool.QueryRow(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count FROM books WHERE id = $1", id).Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount)
+	err := db.Pool.QueryRow(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books WHERE id = $1", id).Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount, &book.CoverImgUrl)
 	if err != nil {
 		return types.Book{}, err
 	}
@@ -48,7 +48,7 @@ func GetRangeWithSortingAndOrder(start, count int, sort string, isAcceding bool)
 		order = "ASC"
 	}
 
-	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count FROM books ORDER BY "+sort+" "+order+" LIMIT $1 OFFSET $2", count, start)
+	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books ORDER BY "+sort+" "+order+" LIMIT $1 OFFSET $2", count, start)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func GetRangeWithSortingAndOrder(start, count int, sort string, isAcceding bool)
 	var books []types.Book
 	for rows.Next() {
 		var book types.Book
-		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount); err != nil {
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount, &book.CoverImgUrl); err != nil {
 			return nil, err
 		}
 		books = append(books, book)
@@ -76,7 +76,7 @@ func SearchQueryWithRange_Sorting_Order(searchQuery string, start, count int, so
 		order = "ASC"
 	}
 
-	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count FROM books WHERE title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1 OR genre ILIKE $1 OR publisher ILIKE $1 OR summary ILIKE $1 ORDER BY "+sort+" "+order+" LIMIT $2 OFFSET $3", "%"+searchQuery+"%", count, start)
+	rows, err := db.Pool.Query(context.Background(), "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books WHERE title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1 OR genre ILIKE $1 OR publisher ILIKE $1 OR summary ILIKE $1 ORDER BY "+sort+" "+order+" LIMIT $2 OFFSET $3", "%"+searchQuery+"%", count, start)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func SearchQueryWithRange_Sorting_Order(searchQuery string, start, count int, so
 	var books []types.Book
 	for rows.Next() {
 		var book types.Book
-		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount); err != nil {
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount, &book.CoverImgUrl); err != nil {
 			return nil, err
 		}
 		books = append(books, book)
@@ -99,7 +99,7 @@ func SearchQueryWithRange_Sorting_Order(searchQuery string, start, count int, so
 }
 
 func FilteredSearchQueryWithRange_Sorting_Order(searchQuery string, start, count int, sort string, order string, filter types.Filters) ([]types.Book, error) {
-	query := "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count FROM books WHERE (title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1 OR genre ILIKE $1 OR publisher ILIKE $1 OR summary ILIKE $1)"
+	query := "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books WHERE (title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1 OR genre ILIKE $1 OR publisher ILIKE $1 OR summary ILIKE $1)"
 	params := []interface{}{"%" + searchQuery + "%"}
 
 	for k, v := range filter.ExactMatch.Values {
@@ -140,7 +140,7 @@ func FilteredSearchQueryWithRange_Sorting_Order(searchQuery string, start, count
 	var books []types.Book
 	for rows.Next() {
 		var book types.Book
-		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount); err != nil {
+		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.PublishedDate, &book.Isbn, &book.Genre, &book.LanguageCode, &book.Publisher, &book.CreatedAt, &book.UpdatedAt, &book.Summary, &book.WordCount, &book.CoverImgUrl); err != nil {
 			return nil, err
 		}
 		books = append(books, book)
