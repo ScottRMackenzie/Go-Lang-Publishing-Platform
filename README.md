@@ -1,5 +1,11 @@
 # Go-Lang-Publishing-Platform
 
+## Distributed architecture differences
+The api and frontend will run on different ports.
+Impacts of this:
+- for any protected route you need to use `credentials: "include"` so the cookies are send with the request
+
+
 ## API
 
 ### Valid JSON Requests
