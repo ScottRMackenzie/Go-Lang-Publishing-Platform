@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -51,6 +52,42 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), "authenticated", true)
 		ctx = context.WithValue(ctx, "username", claims.Username)
 		ctx = context.WithValue(ctx, "token", cookie.Value)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func CombinedAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var tokenStr string
+
+		// Check Authorization header
+		authHeader := r.Header.Get("Authorization")
+		if authHeader != "" {
+			tokenStr = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			// Check token cookie
+			cookie, err := r.Cookie("token")
+			if err == nil {
+				tokenStr = cookie.Value
+			}
+		}
+
+		fmt.Println("Token: ", tokenStr)
+
+		if tokenStr == "" {
+			http.Error(w, "Authorization header or token cookie required", http.StatusUnauthorized)
+			return
+		}
+
+		claims, err := auth.VerifyJWT(tokenStr)
+		if err != nil {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		// Add claims to context if needed
+		ctx := context.WithValue(r.Context(), "username", claims.Username)
+		ctx = context.WithValue(ctx, "authenticated", true)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

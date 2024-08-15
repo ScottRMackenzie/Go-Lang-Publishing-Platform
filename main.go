@@ -5,6 +5,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api"
@@ -45,7 +46,7 @@ func main() {
 		mux := http.NewServeMux()
 
 		mux.HandleFunc("/api/login", api.LoginHandler)
-		mux.Handle("/api/users", middleware.JWTMiddleware(http.HandlerFunc(api.GetUsersHandler)))
+		mux.Handle("/api/users", middleware.CombinedAuthMiddleware(http.HandlerFunc(api.GetUsersHandler)))
 		mux.Handle("/api/users/create", middleware.JWTMiddleware(http.HandlerFunc(api.CreateUserHandler)))
 		mux.Handle("/api/users/verify-email/{token}", middleware.JWTMiddleware(http.HandlerFunc(email_verification.VerifyEmailHandler)))
 		mux.Handle("/api/users/{id}", middleware.JWTMiddleware(http.HandlerFunc(api.GetUserByIDHandler)))
@@ -87,7 +88,9 @@ func main() {
 		mux.Handle("GET /client-api/{path}", middleware.AuthMiddleware(http.HandlerFunc(controller.ClientAPIHandler)))
 		mux.Handle("GET /check-authenticated", middleware.AuthMiddleware(http.HandlerFunc(controller.CheckIfAuthenticatedHandler)))
 
-		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
+		//mux.Handle("GET /api/users", middleware.CombinedAuthMiddleware(http.HandlerFunc(api.GetUsersHandler)))
+
+		middlewareHandler := corsMiddleware(LoggingMiddleware(FrontendMiddleware(mux)))
 
 		staticServer := &http.Server{
 			Addr:    fmt.Sprintf(":%d", staticPort),
@@ -111,11 +114,11 @@ func staticHandle(next http.Handler) http.Handler {
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost")
+		w.Header().Set("Access-Control-Allow-Origin", "http://tb-books.local")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
-		// w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		// Handle preflight requests
 		if r.Method == http.MethodOptions {
@@ -130,6 +133,23 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// print each request
 		fmt.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func FrontendMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host := r.Host
+		parts := strings.Split(host, ".")
+
+		// Check if the host has more than two parts (indicating a subdomain)
+		if len(parts) > 2 {
+			// Skip processing for subdomains
+			http.Error(w, "Subdomain requests are not allowed for port 80", http.StatusForbidden)
+			return
+		}
+
+		// Call the next handler if it's not a subdomain
 		next.ServeHTTP(w, r)
 	})
 }
