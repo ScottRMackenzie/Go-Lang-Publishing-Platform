@@ -1,5 +1,6 @@
 async function DisplayBooks() {
-    res = await fetch('http://api.tb-books.local:2337/api/v1/public/books', {
+    const url = BASE_API_URL + '/api/v1/public/books'; 
+    res = await fetch(url, {
         method: 'GET',
     });
     data = await res.json();
@@ -36,17 +37,17 @@ body.appendChild(gridContainer);
 
 DisplayBooks();
 
-async function GetUsers() {
-    res = await fetch('http://api.tb-books.local:2337/api/users', {
-        method: 'GET',
-        credentials: "include",
-        // credentials: 'include': This will include the cookies in the request if the api server is on a different port and/or domain
-        // credentials: 'same-origin': This will include the cookies in the request is the api server is on the same port and domain
-    });
-    data = await res.json();
+// async function GetUsers() {
+//     res = await fetch('http://api.tb-books.local:2337/api/users', {
+//         method: 'GET',
+//         credentials: "include",
+//         // credentials: 'include': This will include the cookies in the request if the api server is on a different port and/or domain
+//         // credentials: 'same-origin': This will include the cookies in the request is the api server is on the same port and domain
+//     });
+//     data = await res.json();
 
-    console.log(data);
-}
+//     console.log(data);
+// }
 
-GetUsers();
+// GetUsers();
 

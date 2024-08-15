@@ -3,6 +3,7 @@ package email_verification
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db"
 )
@@ -52,5 +53,6 @@ func VerifyEmailHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to delete token", http.StatusInternalServerError)
 	}
 
-	http.Redirect(w, r, "http://localhost:80/create-account/confirm-email/success", http.StatusSeeOther)
+	success_url := os.Getenv("BASE_URL") + "/create-account/confirm-email/success"
+	http.Redirect(w, r, success_url, http.StatusSeeOther)
 }

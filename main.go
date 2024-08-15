@@ -22,8 +22,6 @@ func init() {
 }
 
 func main() {
-	apiPort := 2337
-	staticPort := 80
 	var wg sync.WaitGroup
 
 	err := godotenv.Load()
@@ -31,7 +29,24 @@ func main() {
 		fmt.Println("Error loading .env file:", err)
 		return
 	}
-	db.Connect(fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME")))
+
+	base_url_frontend := os.Getenv("BASE_URL_FRONTEND")
+	base_url_api := os.Getenv("BASE_URL_API")
+	apiPort := os.Getenv("API_PORT")
+	staticPort := os.Getenv("FRONTEND_PORT")
+
+	if base_url_frontend == "" || base_url_api == "" || apiPort == "" || staticPort == "" {
+		fmt.Println("BASE_URL_FRONTEND, BASE_URL_API, API_PORT, and FRONTEND_PORT must be set in the .env file")
+		return
+	}
+
+	// Database
+	if os.Getenv("DB_USER") == "" || os.Getenv("DB_PASSWORD") == "" || os.Getenv("DB_NAME") == "" {
+		fmt.Println("DB_USER, DB_PASSWORD, and DB_NAME must be set in the .env file")
+		return
+	}
+
+	db.Connect(fmt.Sprintf("user=%s password=%s dbname=%s", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME")))
 	defer db.Pool.Close()
 	if err := db.Ping(); err != nil {
 		fmt.Printf("Failed to ping the database: %v", err)
@@ -59,10 +74,10 @@ func main() {
 		middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 
 		apiServer := &http.Server{
-			Addr:    fmt.Sprintf(":%d", apiPort),
+			Addr:    fmt.Sprintf(":%s", apiPort),
 			Handler: middlewareHandler,
 		}
-		fmt.Printf("API server started on :%d\n", apiPort)
+		fmt.Printf("API server started on %s:%s\n", base_url_api, apiPort)
 		if err := apiServer.ListenAndServe(); err != nil {
 			fmt.Printf("API server error: %v\n", err)
 		}
@@ -85,19 +100,14 @@ func main() {
 
 		mux.Handle("GET /browse", middleware.AuthMiddleware(http.HandlerFunc(controller.BrowseHandler)))
 
-		mux.Handle("GET /client-api/{path}", middleware.AuthMiddleware(http.HandlerFunc(controller.ClientAPIHandler)))
-		mux.Handle("GET /check-authenticated", middleware.AuthMiddleware(http.HandlerFunc(controller.CheckIfAuthenticatedHandler)))
-
-		//mux.Handle("GET /api/users", middleware.CombinedAuthMiddleware(http.HandlerFunc(api.GetUsersHandler)))
-
 		middlewareHandler := corsMiddleware(LoggingMiddleware(FrontendMiddleware(mux)))
 
-		staticServer := &http.Server{
-			Addr:    fmt.Sprintf(":%d", staticPort),
+		frontendServer := &http.Server{
+			Addr:    fmt.Sprintf(":%s", staticPort),
 			Handler: middlewareHandler,
 		}
-		fmt.Printf("Template and static file server started on :%d\n", staticPort)
-		if err := staticServer.ListenAndServe(); err != nil {
+		fmt.Printf("Template and static file server started on %s:%s\n", base_url_frontend, staticPort)
+		if err := frontendServer.ListenAndServe(); err != nil {
 			fmt.Printf("Static file server error: %v\n", err)
 		}
 	}()
@@ -116,7 +126,6 @@ func corsMiddleware(next http.Handler) http.Handler {
 		// Set CORS headers
 		w.Header().Set("Access-Control-Allow-Origin", "http://tb-books.local")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 

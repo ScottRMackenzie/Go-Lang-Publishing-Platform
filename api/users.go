@@ -100,6 +100,10 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	emailVerificationToken, err := users.GenerateEmailVerificationToken(context.Background(), newUser.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	email.SendEmailVerification(newUser, emailVerificationToken)
 
@@ -132,6 +136,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hashedPassword, err := users.GetHashedPasswordByUsername(loginReq.Username, context.Background())
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusInternalServerError)
+		return
+	}
+
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(loginReq.Password))
 	if err != nil {
 		http.Error(w, "Invalid credentials", http.StatusBadRequest)

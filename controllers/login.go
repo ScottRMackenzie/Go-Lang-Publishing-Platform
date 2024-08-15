@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"text/template"
 	"time"
 
@@ -44,13 +46,19 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		domain := os.Getenv("DOMAIN")
+		if domain == "" {
+			fmt.Println("DOMAIN environment variable not set, defaulting to localhost")
+			domain = "localhost"
+		}
+
 		http.SetCookie(w, &http.Cookie{
 			Name:     "token",
 			Value:    token,
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour),
 			HttpOnly: true,
-			Domain:   "tb-books.local",
+			Domain:   domain,
 		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -60,13 +68,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+
+	domain := os.Getenv("DOMAIN")
+	if domain == "" {
+		fmt.Println("DOMAIN environment variable not set, defaulting to localhost")
+		domain = "localhost"
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    "",
 		Path:     "/",
 		Expires:  time.Now().Add(-1 * time.Hour),
 		HttpOnly: true,
-		Domain:   "tb-books.local",
+		Domain:   domain,
 	})
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
