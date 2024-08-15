@@ -75,7 +75,6 @@ func main() {
 
 		mux.Handle("GET /static/", staticHandle(http.StripPrefix("/static/", http.FileServer(http.Dir("static")))))
 		mux.Handle("GET /favicon.ico", staticHandle(http.FileServer(http.Dir("static"))))
-		// mux.HandleFunc("GET /static/js/", serveJavaScript)
 		mux.HandleFunc("GET /static/books/covers/{id}", controller.ServeBookCover)
 
 		mux.Handle("GET /", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))

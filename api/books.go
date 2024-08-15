@@ -158,33 +158,3 @@ type Pagination struct {
 	StartIndex int `json:"start_index"`
 	MaxResults int `json:"max_results"`
 }
-
-// type BookFilteredSearchRequest struct {
-//     SearchQuery string `json:"search_query"`
-//     SortBy      struct {
-//         Field string `json:"field"`
-//         Order string `json:"order"`
-//     } `json:"sort_by"`
-//     Pagination struct {
-//         StartIndex int `json:"start_index"`
-//         MaxResults int `json:"max_results"`
-//     } `json:"pagination"`
-//     Filters struct {
-//         ExactMatch struct {
-//             CaseSensitive map[string]bool `json:"case_sensitive"`
-//             Values        map[string]string `json:"values"`
-//         } `json:"exact_match"`
-//         PartialMatch struct {
-//             CaseSensitive map[string]bool `json:"case_sensitive"`
-//             Values        map[string]string `json:"values"`
-//         } `json:"partial_match"`
-//     } `json:"filters"`
-// }
-// type BookFilteredSearchRequest struct {
-// 	Query      string            `json:"query"`
-// 	Sort       string            `json:"sort"`
-// 	Start      int               `json:"start"`
-// 	Count      int               `json:"count"`
-// 	IsAcceding bool              `json:"is_acceding"`
-// 	Filter     map[string]string `json:"filter"`
-// }

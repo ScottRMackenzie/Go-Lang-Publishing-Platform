@@ -57,20 +57,3 @@ func QueryData(ctx context.Context) {
 		log.Fatal(err)
 	}
 }
-
-// func GetUsers(ctx context.Context) [][]string {
-// 	rows, err := Pool.Query(ctx, "SELECT id, username FROM users")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer rows.Close()
-// 	var users [][]string
-// 	for rows.Next() {
-// 		var id, username string
-// 		if err := rows.Scan(&id, &username); err != nil {
-// 			log.Fatal(err)
-// 		}
-// 		users = append(users, []string{id, username})
-// 	}
-// 	return users
-// }

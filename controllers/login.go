@@ -38,23 +38,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// if !user.IsVerified {
-		// 	censoredEmail := user.Email // user.Email[:3] + "*****" + user.Email[len(user.Email)-3:]
-		// 	http.SetCookie(w, &http.Cookie{
-		// 		Name:     "username",
-		// 		Value:    user.Username,
-		// 		Expires:  time.Now().Add(1 * time.Hour),
-		// 		HttpOnly: true,
-		// 	})
-		// 	http.SetCookie(w, &http.Cookie{
-		// 		Name:     "email",
-		// 		Value:    censoredEmail,
-		// 		Expires:  time.Now().Add(1 * time.Hour),
-		// 		HttpOnly: true,
-		// 	})
-		// 	http.Redirect(w, r, "/verify", http.StatusSeeOther)
-		// }
-
 		token, err := auth.GenerateJWT(user.ID, user.Username)
 		if err != nil {
 			http.Error(w, "Failed to generate token", http.StatusInternalServerError)
@@ -66,6 +49,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			Value:    token,
 			Expires:  time.Now().Add(24 * time.Hour),
 			HttpOnly: true,
+			Domain:   ".tb-books.local",
 		})
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -80,6 +64,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(-1 * time.Hour),
 		HttpOnly: true,
+		Domain:   ".tb-books.local",
 	})
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
