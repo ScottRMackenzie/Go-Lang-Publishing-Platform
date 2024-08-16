@@ -7,7 +7,7 @@
 #### Search
 
 `{
-    "search_query": "1984",
+    "search_query": "19",
     "sort_by": {
         "field": "title",
         "order": "ASC"
@@ -17,22 +17,11 @@
         "max_results": -1
     },
     "filters": {
-        "exact_match": {
-            "case_sensitive": {
-                "genre": true
-            },
-            "values": {
-                "genre": "Dystopian",
-                "language_code": "en"
-            }
+        "case_sensitive": {
+            "author": true
         },
-        "partial_match": {
-            "case_sensitive": {
-                "author": false
-            },
-            "values": {
-                "author": "George"
-            }
+        "values": {
+            "author": "%Orwe%"
         }
     }
 }`

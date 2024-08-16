@@ -60,25 +60,14 @@ var ValidOrder = map[string]bool{
 	"ASC": true, "DESC": true,
 }
 
-type MatchFilter struct {
+type Filters struct {
 	CaseSensitive map[string]bool   `json:"case_sensitive"`
 	Values        map[string]string `json:"values"`
 }
 
-type Filters struct {
-	ExactMatch   MatchFilter `json:"exact_match"`
-	PartialMatch MatchFilter `json:"partial_match"`
-}
-
 func InitializeNewFilters() Filters {
 	return Filters{
-		ExactMatch: MatchFilter{
-			CaseSensitive: make(map[string]bool),
-			Values:        make(map[string]string),
-		},
-		PartialMatch: MatchFilter{
-			CaseSensitive: make(map[string]bool),
-			Values:        make(map[string]string),
-		},
+		CaseSensitive: make(map[string]bool),
+		Values:        make(map[string]string),
 	}
 }

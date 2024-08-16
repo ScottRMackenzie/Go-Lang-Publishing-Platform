@@ -120,15 +120,14 @@ func FilteredSearchBooksHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cleanedFilers := types.InitializeNewFilters()
-
-	for k, v := range req.Filters.ExactMatch.Values {
+	for k, v := range req.Filters.Values {
 		if _, ok := types.ValidSortColumns[k]; ok {
-			cleanedFilers.ExactMatch.Values[k] = v
+			cleanedFilers.Values[k] = v
 		}
 	}
-	for k, v := range req.Filters.PartialMatch.Values {
+	for k, v := range req.Filters.CaseSensitive {
 		if _, ok := types.ValidSortColumns[k]; ok {
-			cleanedFilers.PartialMatch.Values[k] = v
+			cleanedFilers.CaseSensitive[k] = v
 		}
 	}
 

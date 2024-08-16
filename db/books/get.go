@@ -102,23 +102,12 @@ func FilteredSearchQueryWithRange_Sorting_Order(searchQuery string, start, count
 	query := "SELECT id, title, author, published_date, isbn, genre, language_code, publisher, created_at, updated_at, summary, word_count, cover_image_url FROM books WHERE (title ILIKE $1 OR author ILIKE $1 OR isbn ILIKE $1 OR genre ILIKE $1 OR publisher ILIKE $1 OR summary ILIKE $1)"
 	params := []interface{}{"%" + searchQuery + "%"}
 
-	for k, v := range filter.ExactMatch.Values {
+	for k, v := range filter.Values {
 		if _, ok := types.ValidSortColumns[k]; !ok {
 			continue
 		}
-		if filter.ExactMatch.CaseSensitive[k] {
-			query += " AND " + k + " = $" + strconv.Itoa(len(params)+1)
-		} else {
-			query += " AND " + k + " ILIKE $" + strconv.Itoa(len(params)+1)
-		}
-		params = append(params, v)
-	}
-	for k, v := range filter.PartialMatch.Values {
-		if _, ok := types.ValidSortColumns[k]; !ok {
-			continue
-		}
-		v = "%" + v + "%"
-		if filter.PartialMatch.CaseSensitive[k] {
+		fmt.Println("is case sensitive: ", filter.CaseSensitive[k])
+		if filter.CaseSensitive[k] {
 			query += " AND " + k + " LIKE $" + strconv.Itoa(len(params)+1)
 		} else {
 			query += " AND " + k + " ILIKE $" + strconv.Itoa(len(params)+1)
