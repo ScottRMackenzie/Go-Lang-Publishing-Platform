@@ -2,7 +2,6 @@ package books
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db"
@@ -106,7 +105,6 @@ func FilteredSearchQueryWithRange_Sorting_Order(searchQuery string, start, count
 		if _, ok := types.ValidSortColumns[k]; !ok {
 			continue
 		}
-		fmt.Println("is case sensitive: ", filter.CaseSensitive[k])
 		if filter.CaseSensitive[k] {
 			query += " AND " + k + " LIKE $" + strconv.Itoa(len(params)+1)
 		} else {
@@ -118,8 +116,6 @@ func FilteredSearchQueryWithRange_Sorting_Order(searchQuery string, start, count
 	query += " ORDER BY " + sort + " " + order + " LIMIT $" + strconv.Itoa(len(params)+1) + " OFFSET $" + strconv.Itoa(len(params)+2)
 	params = append(params, count, start)
 
-	fmt.Println(query)
-	fmt.Println(params)
 	rows, err := db.Pool.Query(context.Background(), query, params...)
 	if err != nil {
 		return nil, err

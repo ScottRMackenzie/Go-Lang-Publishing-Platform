@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -71,8 +70,6 @@ func CombinedAuthMiddleware(next http.Handler) http.Handler {
 				tokenStr = cookie.Value
 			}
 		}
-
-		fmt.Println("Token: ", tokenStr)
 
 		if tokenStr == "" {
 			http.Error(w, "Authorization header or token cookie required", http.StatusUnauthorized)

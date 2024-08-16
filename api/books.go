@@ -64,39 +64,39 @@ type BookSortingRequest struct {
 	IsAcceding bool   `json:"is_acceding"`
 }
 
-func SearchBooksHandler(w http.ResponseWriter, r *http.Request) {
-	var req BookSearchRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
-		return
-	}
+// func SearchBooksHandler(w http.ResponseWriter, r *http.Request) {
+// 	var req BookSearchRequest
+// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+// 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+// 		return
+// 	}
 
-	if req.Count == -1 {
-		req.Count = 1000000
-	}
+// 	if req.Count == -1 {
+// 		req.Count = 1000000
+// 	}
 
-	if _, ok := types.ValidSortColumns[req.Sort]; !ok {
-		http.Error(w, "Invalid sort column", http.StatusBadRequest)
-		return
-	}
+// 	if _, ok := types.ValidSortColumns[req.Sort]; !ok {
+// 		http.Error(w, "Invalid sort column", http.StatusBadRequest)
+// 		return
+// 	}
 
-	books, err := books.SearchQueryWithRange_Sorting_Order(req.Query, req.Start, req.Count, req.Sort, req.IsAcceding)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// 	books, err := books.SearchQueryWithRange_Sorting_Order(req.Query, req.Start, req.Count, req.Sort, req.IsAcceding)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(books)
-}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(books)
+// }
 
-type BookSearchRequest struct {
-	Query      string `json:"query"`
-	Sort       string `json:"sort"`
-	Start      int    `json:"start"`
-	Count      int    `json:"count"`
-	IsAcceding bool   `json:"is_acceding"`
-}
+// type BookSearchRequest struct {
+// 	Query      string `json:"query"`
+// 	Sort       string `json:"sort"`
+// 	Start      int    `json:"start"`
+// 	Count      int    `json:"count"`
+// 	IsAcceding bool   `json:"is_acceding"`
+// }
 
 func FilteredSearchBooksHandler(w http.ResponseWriter, r *http.Request) {
 	var req BookFilteredSearchRequest

@@ -13,7 +13,6 @@ import (
 )
 
 func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Context().Value("username"))
 	users, err := users.GetAll(context.Background())
 	if err != nil {
 		errorResponse(w, http.StatusInternalServerError, err.Error())
