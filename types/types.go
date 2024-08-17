@@ -26,8 +26,8 @@ type Book struct {
 	Summary         string    `json:"summary"`
 	WordCount       int       `json:"word_count"`
 	CoverImgUrl     string    `json:"cover_img_url"`
-	Price           Price     `json:"price"`
-	DiscountedPrice float64   `json:"discounted_price"`
+	Price           float32   `json:"price"`
+	DiscountedPrice float32   `json:"discounted_price"`
 }
 
 type Discount struct {
