@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="/static/js/games/blackjack/blackjack.js"></script>
+    {{ template "baseURL.html" . }}
+    <title>♠2️⃣1️⃣ Blackjack</title>
+</head>
+<body>
+    {{ template "navbar.html" . }}
+    <h1 class="font-bold text-2xl">♠2️⃣1️⃣ Blackjack</h1>
+    <input type="number" class="border border-gray-300 rounded-md p-2" id="betAmount" placeholder="Enter bet amount" required>
+    <button id="newGame" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Place Bet</button>
+    <div id="gameState" hidden>
+        <p class="font-bold text-2x1" id="gameStateText"></p>
+        <button id="hitButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Hit</button>
+        <button id="standButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Stand</button>
+        <div id="dealer">
+            <p>Dealer's score: <span id="dealer_score"></span></p>
+            <div id="dealer_hand"></div>
+        </div>
+        <div id="player">
+            <p>Your score: <span id="player_score"></span></p>
+            <div id="player_hand"></div>
+        </div>
+    </div>
+</body>
+</html>

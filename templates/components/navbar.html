@@ -16,7 +16,7 @@
                 <li class="md:px-4 md:py-2 {{ if eq .ActivePage "contact" }}text-indigo-500{{ else }}hover:text-indigo-400{{ end }}"><a href="#">Contact</a></li>
             </ul>
 		</div>
-		<div class="order-2 md:order-3">
+		<div class="order-2 md:order-3 md:w-auto w-full">
             {{if not .Authenticated}}
 			<button class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-gray-50 rounded-xl flex items-center gap-2">
                 <!-- Heroicons - Login Solid -->
@@ -26,10 +26,13 @@
                 <span><a href="/login">Login</a></span>
             </button>
             {{ else }}
+            {{ if eq .ActivePage "Games" }}
+            <p id="balance_display" class="text-gray-500 items-center gap-2">Balance: <span id="balance_value">{{.Balance}}</span></p>
+            {{ end }}
             <button class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-gray-50 rounded-xl items-center gap-2">
                 <span><a href="/logout">Logout</a></span>
             </button>
             {{ end }}
-		</div>
+		</div>`
 	</div>
 </nav>

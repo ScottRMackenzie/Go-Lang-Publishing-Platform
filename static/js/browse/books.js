@@ -6,7 +6,7 @@ async function DisplayBooks() {
     if (isLoading) return;
     isLoading = true;
 
-    const url = BASE_API_URL + '/api/v1/public/books/sorted'; 
+    const url = 'http://'+ DOMAIN + '/api/v1/public/books/sorted'; 
     const params = {
         start: start,
         count: count,

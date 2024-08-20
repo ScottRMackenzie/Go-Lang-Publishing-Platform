@@ -8,7 +8,7 @@ import (
 )
 
 func GetAll(ctx context.Context) ([]types.User, error) {
-	rows, err := db.Pool.Query(ctx, "SELECT id, username, email, is_verified, created_at FROM users")
+	rows, err := db.Pool.Query(ctx, "SELECT id, username, email, is_verified, created_at, balance FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func GetAll(ctx context.Context) ([]types.User, error) {
 	var users []types.User
 	for rows.Next() {
 		var user types.User
-		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.IsVerified, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.IsVerified, &user.CreatedAt, &user.Balance); err != nil {
 			return nil, err
 		}
 		// user.CreatedAtStr = user.CreatedAt.Format("2006-01-02 15:04:05")
@@ -43,7 +43,7 @@ func GetByID(id string, ctx context.Context) (types.User, error) {
 
 func GetByUsername(username string, ctx context.Context) (types.User, error) {
 	var user types.User
-	err := db.Pool.QueryRow(ctx, "SELECT id, username FROM users WHERE username = $1", username).Scan(&user.ID, &user.Username)
+	err := db.Pool.QueryRow(ctx, "SELECT id, username, email, is_verified, created_at, balance FROM users WHERE username = $1", username).Scan(&user.ID, &user.Username, &user.Email, &user.IsVerified, &user.CreatedAt, &user.Balance)
 	if err != nil {
 		return types.User{}, err
 	}

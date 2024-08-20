@@ -10,6 +10,7 @@ type User struct {
 	Email      string    `json:"email"`
 	CreatedAt  time.Time `json:"created_at"`
 	IsVerified bool      `json:"is_verified"`
+	Balance    int       `json:"balance"`
 }
 
 type Book struct {

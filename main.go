@@ -9,6 +9,7 @@ import (
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api"
 	email_verification "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/api/verification"
 	controller "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/controllers"
+	bj_controller "github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/controllers/games/blackjack"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/db"
 	"github.com/ScottRMackenzie/Go-Lang-Publishing-Platform/middleware"
 	"github.com/joho/godotenv"
@@ -66,7 +67,7 @@ func main() {
 	mux.Handle("GET /favicon.ico", staticHandle(http.FileServer(http.Dir("static"))))
 	mux.HandleFunc("GET /static/books/covers/{id}", controller.ServeBookCover)
 
-	mux.Handle("GET /", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
+	mux.Handle("/", middleware.AuthMiddleware(http.HandlerFunc(controller.HomeHandler)))
 	mux.Handle("GET /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 	mux.Handle("POST /login", middleware.AuthMiddleware(http.HandlerFunc(controller.LoginHandler)))
 	mux.Handle("GET /logout", middleware.AuthMiddleware(http.HandlerFunc(controller.LogoutHandler)))
@@ -75,6 +76,9 @@ func main() {
 	mux.Handle("GET /book/{id}", middleware.AuthMiddleware(http.HandlerFunc(controller.BookHandler)))
 
 	mux.Handle("GET /games", middleware.AuthMiddleware(http.HandlerFunc(controller.GamesHandler)))
+	mux.Handle("GET /games/bj", middleware.AuthMiddleware(http.HandlerFunc(bj_controller.BlackjackFrontendHandler)))
+
+	mux.Handle("/ws/games/bj", middleware.AuthMiddleware(http.HandlerFunc(bj_controller.BlackjackGameHandler)))
 
 	middlewareHandler := corsMiddleware(LoggingMiddleware(mux))
 

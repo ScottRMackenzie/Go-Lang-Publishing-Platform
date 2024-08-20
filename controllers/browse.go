@@ -7,7 +7,7 @@ import (
 )
 
 func BrowseHandler(w http.ResponseWriter, r *http.Request) {
-	baseApiUrl := os.Getenv("BASE_URL_API")
+	DOMAIN := os.Getenv("DOMAIN")
 
 	browseTemplate := template.Must(template.ParseFiles("templates/browse.html", "templates/components/navbar.html", "templates/components/baseURL.html"))
 
@@ -16,11 +16,11 @@ func BrowseHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Authenticated bool
 		ActivePage    string
-		BaseApiUrl    string
+		DOMAIN        string
 	}{
 		Authenticated: authenticated,
 		ActivePage:    "browse",
-		BaseApiUrl:    baseApiUrl,
+		DOMAIN:        DOMAIN,
 	}
 
 	if err := browseTemplate.ExecuteTemplate(w, "browse.html", data); err != nil {
