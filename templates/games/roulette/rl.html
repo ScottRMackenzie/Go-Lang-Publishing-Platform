@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>European Roulette Table</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
+    <script defer src="/static/js/games/roulette/roulette.js"></script>
+    <link href="/static/css/custom/games/roulette/styles.css" rel="stylesheet">
+    {{ template "baseURL.html" . }}
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body oncontextmenu="return false;">
+    {{ template "navbar.html" . }}
+    <div class="bg-green-800 items-center justify-center p-6">
+        <h1 class="text-2xl font-bold mb-4 text-center text-white">European Roulette Table</h1>
+
+        <!-- <img src="../../../static/images/roulette/wheel.png" alt="Roulette Wheel" style="width: 20%; height: auto;">
+    <div class="flex gap-1"> -->
+        <div class="flex p-4">
+            <div class="grid grid-rows-8 gap-0 p-0">
+                <h2 class="text-2xl font-bold mb-2 text-center text-white">Results History</h2>
+                <div class="row-span-1">
+                    <p id="result_1" class="text-center text-white">32🔴</p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_2" class="text-center text-white">13⚫</p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_3" class="text-center text-white">27🔴</p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_4" class="text-center text-white">0🟢</p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_5" class="text-center text-white"></p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_6" class="text-center text-white"></p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_7" class="text-center text-white"></p>
+                </div>
+                <div class="row-span-1">
+                    <p id="result_8" class="text-center text-white"></p>
+                </div>
+            </div>
+            <div id="wheel_container" class="p-6"></div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-4 gap-1 p-1">
+                    <div class="col-span-1">
+                        <button id="clear" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="clearBets()">
+                            Clear
+                        </button>
+                    </div>
+                    <div class="col-span-1">
+                        <button id="spin" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            Spin
+                        </button>
+                    </div>
+                    <div class="col-span-1">
+                        <button id="repeat" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="repeatBets()">
+                            Repeat
+                        </button>
+                    </div>
+                    <div class="col-span-1">
+                        <button id="skip" class="w-full bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded" onclick="skipSpin()">
+                            Skip
+                        </button>
+                    </div>
+                </div>
+                <p id="label_chips" class="text-center pb-0.5" style="color: white;">Select a chip:</p>
+                <div id="chips" class="grid grid-cols-7 gap-2 p-2 py-0">
+                    <div class="chips">
+                        <img id="white_chip" src="/static//images/roulette/white_chip_blank.png" alt="white chip" class="w-14 h-14" onclick="selectBet('white')">
+                        <p id="white_chip_label" class="text-black">25c</p>
+                    </div>
+                    <div class="chips">
+                        <img id="red_chip" src="/static//images/roulette/red_chip_blank.png" alt="red chip" class="w-14 h-14" onclick="selectBet('red')">
+                        <p id="red_chip_label" class="text-white">50c</p>
+                    </div>
+                        <div class="chips">
+                        <img id="blue_chip" src="/static//images/roulette/blue_chip_blank.png" alt="blue chip" class="w-14 h-14" onclick="selectBet('blue')">
+                        <p class="text-white">100c</p>
+                    </div>
+                    <div class="chips">
+                        <img id="green_chip" src="/static//images/roulette/green_chip_blank.png" alt="green chip" class="w-14 h-14" onclick="selectBet('green')">
+                        <p id="green_chip_label" class="text-white">500c</p>
+                    </div>
+                    <div class="chips">
+                        <img id="black_chip" src="/static//images/roulette/black_chip_blank.png" alt="black chip" class="w-14 h-14" onclick="selectBet('black')">
+                        <p id="black_chip_label" class="text-white">1kc</p>
+                    </div>
+                    <div class="chips">
+                        <img id="purple_chip" src="/static//images/roulette/purple_chip_blank.png" alt="purple chip" class="w-14 h-14" onclick="selectBet('purple')">
+                        <p id="purple_chip_label" class="text-white">5kc</p>
+                    </div>
+                    <div class="chips">
+                        <img id="yellow_chip" src="/static//images/roulette/yellow_chip_blank.png" alt="yellow chip" class="w-14 h-14" onclick="selectBet('yellow')">
+                        <p id="yellow_chip_label" class="text-black">10kc</p>
+                    </div>
+                </div>
+                <p id="totalBetDisplay" class="text-center text-white">Amount Bet: 0c</p>
+                <p id="message_display" class="text-center font-bold text-4xl" style="color: white;">Place your bets!</p>
+            </div>
+        </div>
+        <div id="betting_board" class="flex p-4">
+            <div class="grid grid-rows-5 gap-1 p-1">
+                <div class="row-span-1"></div>
+                <div class="row-span-3">
+                    <div class="w">
+                        <button id="bet_straightUp_0" class="h-full bg-green-500 hover:bg-green-700 text-white font-bold py-4 px-4 rounded">
+                            <span style="writing-mode: vertical-lr;">0</span>
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="row-span-1"></div>
+            </div>
+            <div class="grid grid-cols-4 gap-2 p-1">
+                <div class="col-span-4">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_dozens_1st" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white text-w font-bold py-2 px-4 rounded">
+                            1st 12
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_3" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            3
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_6" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            6
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div> 
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_9" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            9
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_12" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            12
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_2" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            2
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_5" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            5
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_8" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            8
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_11" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            11
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_1" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            1
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_4" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            4
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_7" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            7
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_10" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            10
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_lowHigh_low" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            1 to 18
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_evenOdd_even" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            Even
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-2 p-1">
+                <div class="col-span-4">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_dozens_2nd" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            2nd 12
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_15" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            15
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_18" class="w-full bg-red-500 hover:bg-red-70 text-white font-bold py-2 px-4 rounded">
+                            18
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_9" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            21
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_24" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            24
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_14" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            14
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_17" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            17
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_20" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            20
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_23" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            23
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_13" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            13
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_16" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            16
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_19" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            19
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_22" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            22
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_color_red" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            🔴
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_color_black" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            ⚫
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="grid grid-cols-4 gap-2 p-1">
+                <div class="col-span-4">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_dozens_3rd" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            3rd 12
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_27" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            27
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_30" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            30
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_33" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            33
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_36" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            36
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_26" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            26
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_29" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            29
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_32" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            32
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_35" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            35
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_25" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            25
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_28" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            28
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_31" class="w-full bg-black hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                            31
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-1">
+                    <div class="button-container">
+                        <button id="bet_straightUp_34" class="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            34
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_evenOdd_odd" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            Odd
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="col-span-2">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_lowHigh_high" class="w-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            19 to 36
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-rows-5 gap-1 p-1">
+                <div class="row-span-1"></div>
+                <div class="row-span-1">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_columns_3rd" class="h-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            2 to 1
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="row-span-1">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_columns_2nd" class="h-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            2 to 1
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="row-span-1">
+                    <div class="button-container-no-rotate">
+                        <button id="bet_columns_1st" class="h-full border-2 border-solid border-white hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                            2 to 1
+                        </button>
+                        <img src="/static/images/roulette/red_chip_og.png" alt="Poker chip" hidden>
+                        <p class="text-white" hidden></p>
+                    </div>
+                </div>
+                <div class="row-span-1"></div>
+            </div>
+        </div>
+    </div>
+</body>
